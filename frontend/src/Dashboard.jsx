@@ -3,21 +3,6 @@ import { Card, Row, Col, Table, Button, Modal, Tag, Divider, Switch, ConfigProvi
 import { theme } from "antd";
 import axios from 'axios';
 
-import {
-    obtenerEspacios,
-    obtener_productos_en_espacio,
-    obtener_conteo_productos,
-    solicitar_productos,
-    entregar_productos_de_solicitud,
-    mover_producto_de_espacio,
-    eliminar_producto,
-    enviar_producto_a_grupo,
-    entregar_producto,
-    obtener_productos_disponibles,
-    cantidad_productos_por_sku,
-    proximos_obsoletos
-  } from '../backend/controllers_gestion';
-
 const { Header, Content } = Layout;
 const URL = 'http://localhost:5000';
 
