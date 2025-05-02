@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { setTokenOrdenes } from './controllers_ordenes.js'; //importo el setTokenOrdenes de las ordenes para obtener el token desde acá
+
 const URL_API_GEST = 'https://dev.proyecto.2025-1.tallerdeintegracion.cl/starlink-factory';
 //variable que se usara para almacenar el token internamente en el backend
 let TOKEN = null;
@@ -18,6 +20,9 @@ const getToken = async (req, res) => {
     const token = response.data.token;
     //Guardamos el token para poder usarlo internamente en el backend
     TOKEN = response.data.token
+    
+    setTokenOrdenes(token); //utilizamos el mismo token tambien para las ordenes
+
     res.json({ token });
   } catch (error) {
     console.error('Error al obtener el token:', error);
@@ -321,9 +326,6 @@ const cantidad_productos_por_sku = async (req, res) => {
     return res.status(500).json({ error: 'Error al calcular cantidades totales por SKU' });
   }
 };
-
-
-
 
 
 // ---------------------FIN-------------------------Funciones para calculo de métricas-------------------------------FIN--------------------

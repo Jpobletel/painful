@@ -24,6 +24,7 @@ services:
       - db
     networks:
       - painful_net
+    command: sh -c "npx sequelize-cli db:migrate && npm start"
 
   db:
     image: postgres:15

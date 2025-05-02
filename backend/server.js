@@ -1,30 +1,50 @@
 import express from 'express';
 import cors from 'cors';
-import Client from 'pg';
-import rutasGestion from './rutas_gestion.js'; // <--- Importa tus rutas
+import rutasGestion from './rutas_gestion.js';
+import { sequelize } from './database/index.js';
 
 const app = express();
 
+sequelize.authenticate()
+    .then(async () => {
+        console.log('Connected to PostgreSQL with Sequelize');
+        try {
+            // Fetch schemas
+            const [schemas] = await sequelize.query(`
+                SELECT schema_name
+                FROM information_schema.schemata
+            `);
+            console.log('Schemas in the database:', schemas.map(schema => schema.schema_name));
 
-
-// const client = new Client({
-//     host: process.env.DB_HOST,
-//     port: process.env.DB_PORT,
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASSWORD,
-//     database: process.env.DB_NAME,
-// });
-
-// client.connect()
-//     .then(() => console.log('Conectado a PostgreSQL'))
-//     .catch(err => console.error('Error de conexión', err));
+            // Fetch tables
+            const [tables] = await sequelize.query(`
+                SELECT table_schema, table_name
+                FROM information_schema.tables
+                WHERE table_type = 'BASE TABLE'
+                AND table_schema NOT IN ('pg_catalog', 'information_schema')
+            `);
+            console.log('Tables in the database:');
+            tables.forEach(table => {
+                console.log(`Schema: ${table.table_schema}, Table: ${table.table_name}`);
+            });
+        } catch (error) {
+            console.error('Error fetching schemas or tables:', error);
+        }
+    })
+    .catch(err => console.error('Sequelize connection error:', err));
 
 app.use(cors());
-app.use(express.json()); // <--- Asegúrate de poder leer JSON
-app.use('/', rutasGestion); 
+app.use(express.json());
+app.use('/', rutasGestion);
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
+app.get('/test-db', async (req, res) => {
+    try {
+        const [result] = await sequelize.query('SELECT NOW()');
+        res.json({ success: true, time: result[0].now });
+    } catch (error) {
+        console.error('Error querying the database:', error);
+        res.status(500).json({ success: false, error: 'Database query failed' });
+    }
 });
 
 app.listen(5000, () => {

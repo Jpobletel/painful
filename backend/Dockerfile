@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copiar archivos
 COPY package*.json ./
+COPY .sequelizerc ./
 RUN npm install
 COPY . .
 
